@@ -8,6 +8,7 @@ function chr_gen{
     return $chr
 }
 
+
 function password_creator($length, $chr_randomizer){
     $password = $null
     1.. $length | & $chr_randomizer >> $password
@@ -30,27 +31,28 @@ function map($function, $iterable){
 #then it's called with &
 
 function create_user($user){
-    #$user should have every parameter available as an attribute
-
-}
-
-
-foreach ($item in $Users) {
-    $Username= $item.Username
-    $password = ''
-    1..15 | chr_gen >> $password
+    $Username= $user.Username
+    $password = password_creator(15, function:chr_gen)
     New-ADUser
-    -UserPrincipalName $item.email `
-    -SamAccountName $item.Username `
+    -UserPrincipalName $user.email `
+    -SamAccountName $user.Username `
     -UserPrincipalName "$Username@yourdomain.com" `
-    -Name "$item.Firstname $item.Lastname" `
-    -GivenName $item.Firstname `
-    -Surname $item.Lastname `
+    -Name "$user.Firstname $user.Lastname" `
+    -GivenName $user.Firstname `
+    -Surname $user.Lastname `
     -Enabled $True `
     -ChangePasswordAtLogon $True `
-    -DisplayName "$item.Lastname, $item.Firstname" `
+    -DisplayName "$user.Lastname, $user.Firstname" `
     -Department $Department `
     -Path $OU `
     -AccountPassword (convertto-securestring $password -AsPlainText -Force)
-    
+    return $username + ',' + $password
 }
+
+
+function csv_to_array($csv_input){
+    $converted_array = ConvertFrom-Csv -path $csv_input
+    return $converted_array
+}
+
+map($function:create_user, csv_to_array(read-host 'where is the csv file?'))
