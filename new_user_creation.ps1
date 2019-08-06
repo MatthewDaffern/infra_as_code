@@ -15,7 +15,7 @@ function password_creator($length, $chr_randomizer){
     return $password
 }
 
-
+#got to figure out a map implementation. 
 function map($function, $iterable){
     $old_iterable = $iterable
     $new_iterable = @()
